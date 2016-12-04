@@ -4,30 +4,8 @@ gpio.mode(CHANNEL_1, gpio.OUTPUT, gpio.PULLUP)
 svr = net.createServer(net.UDP)
 
 svr:on("receive", function(socket, message)
-
-    function validateMessage(json)                
-        if json == nil or json['protocol'] ~= PROTOCOL or type(json['targets']) ~= 'table' then
-            return false
-         end    
-
-         isTarget = false
-         for k,v in pairs(json['targets']) do
-            if v == NODE_ID then isTarget = true end
-         end
-    
-        return isTarget
-    end
-    
-    function decodeMessage(message)        
-        ok, json = pcall(cjson.decode, message)
-        if not ok or not validateMessage(json) then
-            json = nil
-        end
-        
-        return json
-    end
-    
-    message = decodeMessage(message)
+    network_message = require "network_message" 
+    message = network_message.decodeMessage(message)
 
     if message['event'] ~= nil then
         print(message['event'])
